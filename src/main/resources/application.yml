@@ -11,3 +11,13 @@ eureka:
     fetchRegistry: false
     server:
       waitTimeInMsWhenSyncEmpty: 0
+
+zuul:
+  prefix: /api
+  routes:
+    inventory-service:
+      path: /inventory-service/**
+      url: http://localhost:8100
+    sales-service:
+      path: /sales-service/**
+      url: http://localhost:8102
