@@ -1,9 +1,25 @@
+buildscript {
+	repositories {
+		mavenCentral()
+		maven{
+			url "https://plugins.gradle.org/m2/"
+		}
+
+	}
+	dependencies {
+		classpath("org.springframework.boot:spring-boot-gradle-plugin:2.1.6.RELEASE")
+		classpath "gradle.plugin.com.palantir.gradle.docker:gradle-docker:0.22.1"
+	}
+}
+
 plugins {
 	id 'org.springframework.boot' version '2.1.8.RELEASE'
 	id 'io.spring.dependency-management' version '1.0.8.RELEASE'
 	id 'java'
 	id "io.swagger.core.v3.swagger-gradle-plugin" version "2.0.9.1"
 }
+
+apply plugin: 'com.palantir.docker'
 
 group = 'com.rifkiansyah'
 version = '0.0.1-SNAPSHOT'
@@ -14,6 +30,11 @@ configurations {
 	runtimeClasspath {
 		extendsFrom developmentOnly
 	}
+}
+
+bootJar {
+	baseName = 'main-service-docker'
+	version =  '0.1'
 }
 
 repositories {
@@ -43,4 +64,17 @@ dependencyManagement {
 	imports {
 		mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
 	}
+}
+
+targetCompatibility = 1.8
+
+task unpack(type: Copy) {
+	dependsOn bootJar
+	from(zipTree(tasks.bootJar.outputs.files.singleFile))
+	into("build/dependency")
+}
+docker {
+	name "${project.group}/${bootJar.baseName}"
+	copySpec.from(tasks.unpack.outputs).into("dependency")
+	buildArgs(['DEPENDENCY': "dependency"])
 }
