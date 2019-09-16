@@ -8,10 +8,44 @@ services:
       - POSTGRES_PASSWORD=postgres
     ports:
       - "5432:5432"
-    app:
-      build: app/
-      ports:
-        - "8101:8101"
 
-  volumes:
-    db-data:
+  main-service:
+    image: openjdk:8
+    build: ./main
+    volumes:
+      - ./main:/tmp/main
+    ports:
+      - "8101:8101"
+
+  sales-service:
+    image: openjdk:8
+    build: ./sales
+    volumes:
+      - ./sales:/tmp/sales
+    ports:
+      - "8100:8100"
+    depends_on:
+      - postgres
+      - main-service
+
+  inventory-service:
+    image: openjdk:8
+    build: ./inventory
+    volumes:
+      - ./inventory:/tmp/inventory
+    ports:
+      - "8102:8102"
+    depends_on:
+      - postgres
+      - main-service
+
+  partner-service:
+    image: openjdk:8
+    build: ./partner
+    volumes:
+      - ./partner:/tmp/partner
+    ports:
+      - "8103:8103"
+    depends_on:
+      - postgres
+      - main-service
