@@ -1,5 +1,5 @@
 FROM openjdk:8
-COPY . /usr/src/main
+COPY https://github.com/rifkiansyahmc/main-eureka.git /usr/src/main
 WORKDIR /usr/src/main
 EXPOSE 8101
 VOLUME /tmp
